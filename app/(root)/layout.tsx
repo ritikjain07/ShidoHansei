@@ -1,7 +1,10 @@
+import { isAuthenticated } from '@/lib/actions/auth.action'
 import Link from 'next/link'
 import { ReactNode } from 'react'
-
-const RootLayout = ({ children }: { children: ReactNode }) => {
+import { redirect } from 'next/navigation';
+const RootLayout = async ({ children }: { children: ReactNode }) => {
+    const isUserAuthenticated = await isAuthenticated();
+    if (!isUserAuthenticated) redirect('/sign-in');
     return (
         <div className='root-layout'>
             <nav>
