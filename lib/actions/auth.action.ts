@@ -1,7 +1,6 @@
 'use server';
 import { auth, db } from "@/firebase/admin";
 import { cookies } from "next/headers";
-import { is } from './../../.next/static/chunks/[root of the server]__73499ecc._';
 
 const ONE_WEEK = 60 * 60 * 24 * 7 * 1000; // 1 week in milliseconds
 
