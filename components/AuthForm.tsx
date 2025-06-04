@@ -70,10 +70,17 @@ const AuthForm = ({ type }: { type: FormType }) => {
                 toast.success('Sign in successfully.');
                 router.push('/')
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.log(error);
-            // Improved error handling
-            const errorMessage = error?.message || 'An unknown error occurred';
+            // Improved error handling with proper type checking
+            let errorMessage = 'An unknown error occurred';
+            
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            } else if (typeof error === 'string') {
+                errorMessage = error;
+            }
+            
             toast.error(`Authentication error: ${errorMessage}`);
         }
     }

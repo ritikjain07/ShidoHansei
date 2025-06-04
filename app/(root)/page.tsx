@@ -17,7 +17,7 @@ const Page = () => {
                     </h2>
                     <p>
                         ShidoHansei is an AI-powered platform that helps you prepare for job interviews by providing personalized feedback and guidance. With ShidoHansei, you can practice your interview skills and get real-time feedback on your performance.
-                        Whether you're a recent graduate or an experienced professional, ShidoHansei can help you improve your interview skills and land your dream job.
+                        Whether you&apos;re a recent graduate or an experienced professional, ShidoHansei can help you improve your interview skills and land your dream job.
                     </p>
                     <Button asChild className="btn-primary max-sm:w-full">
                         <Link href="/interview">
@@ -59,11 +59,13 @@ const Page = () => {
 
                 <div className='interview-section'>
                     {dummyInterviews.map((interview)=>(
+
                         <InterviewCard key={interview.id} {...interview}/>
                     ))}
                     {/* <p>
-                        there is no interview avalable;
+                        there is no interview available;
                     </p> */}
+
 
                 </div>
 

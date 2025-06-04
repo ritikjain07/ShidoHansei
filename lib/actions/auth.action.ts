@@ -27,19 +27,23 @@ export async function signUp(params: SignUpParams) {
             message: 'Sign up successful'
         };
 
-    } catch (e : any) {
+    } catch (e: unknown) {
         console.error('Error during sign up:', e);
 
-        if(e.code === 'auth/email-already-in-use') {
+        // Type guard to safely access error properties
+        if (e && typeof e === 'object' && 'code' in e && e.code === 'auth/email-already-in-use') {
             return { 
                 success: false,
                 message: 'Email already in use' 
             };
         }
         
+        // Safe error message extraction
+        const errorMessage = e instanceof Error ? e.message : 'Please try again later.';
+        
         return {
             success: false,
-            message: `Sign up failed: ${e.message || 'Please try again later.'}`
+            message: `Sign up failed: ${errorMessage}`
         }
     }
 }
@@ -63,19 +67,23 @@ export async function signIn(params: SignInParams) {
             message: 'Sign in successful'
         };
 
-    } catch (e : any) {
+    } catch (e: unknown) {
         console.error('Error during sign in:', e);
         
-        if(e.code === 'auth/user-not-found') {
+        // Type guard to safely access error properties
+        if (e && typeof e === 'object' && 'code' in e && e.code === 'auth/user-not-found') {
             return { 
                 success: false,
                 message: 'User not found' 
             };
         }
 
+        // Safe error message extraction
+        const errorMessage = e instanceof Error ? e.message : 'Please try again later.';
+
         return {
             success: false,
-            message: `Sign in failed: ${e.message || 'Please try again later.'}`
+            message: `Sign in failed: ${errorMessage}`
         }
     }
 }
@@ -88,7 +96,9 @@ export async function setSessionCookie(idToken: string) {
     // ONE_WEEK in milliseconds
     const ONE_WEEK_SECONDS = Math.floor(ONE_WEEK / 1000); // Convert to seconds
     
-    cookies().set({
+    // FIXED: Await the cookies() function before using its methods
+    const cookieStore = await cookies();
+    cookieStore.set({
         name: 'session',
         value: sessionCookie,
         maxAge: ONE_WEEK_SECONDS,
@@ -104,8 +114,10 @@ export async function setSessionCookie(idToken: string) {
 export async function getCurrentUser() {
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get('session')?.value;
-     if(!sessionCookie) {
-        return null;};
+    
+    if(!sessionCookie) {
+        return null;
+    }
 
     try {
         const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
@@ -118,15 +130,13 @@ export async function getCurrentUser() {
             id: userRecord.id,
         } as User;
 
-    } catch(e){
-        console.log(e)
+    } catch(e: unknown) {
+        console.log(e);
         return null;
     }
-
 }
-
 
 export async function isAuthenticated() {
     const user = await getCurrentUser();
-    return !! user;
+    return !!user;
 }

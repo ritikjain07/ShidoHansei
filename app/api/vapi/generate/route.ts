@@ -1,7 +1,28 @@
 import { getRandomInterviewCover } from "@/lib/utils";
 import { google } from "@ai-sdk/google";
 import { generateText } from "ai";
-import { db } from "@/firebase/admin"; // Add this import if missing
+import { db } from "@/firebase/admin";
+
+interface InterviewRequest {
+  type: string;
+  role: string;
+  level: string;
+  techstack: string;
+  amount: number;
+  userid: string;
+}
+
+interface Interview {
+  role: string;
+  level: string;
+  techstack: string[];
+  type: string;
+  questions: string[];
+  userId: string;
+  coverImage: string;
+  finalized: boolean;
+  createdAt: string;
+}
 
 export async function GET() {
   return Response.json({ success: true, data: 'THANK YOU FOR USING VAPI' }, { status: 200 });
@@ -10,7 +31,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     // Extract request data
-    const { type, role, level, techstack, amount, userid } = await request.json();
+    const { type, role, level, techstack, amount, userid }: InterviewRequest = await request.json();
     
     // Validate required fields
     if (!type || !role || !level || !techstack || !amount || !userid) {
@@ -69,7 +90,7 @@ export async function POST(request: Request) {
     }
 
     // Create interview document
-    const interview = {
+    const interview: Interview = {
       role,
       level,
       techstack: techstack.split(',').map(tech => tech.trim()),
@@ -93,12 +114,15 @@ export async function POST(request: Request) {
       }
     }, { status: 200 });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Interview generation error:', error);
+    
+    // Type guard to safely access error properties
+    const errorMessage = error instanceof Error ? error.message : 'An error occurred while processing your request.';
     
     return Response.json({
       success: false, 
-      error: error.message || 'An error occurred while processing your request.'
+      error: errorMessage
     }, { status: 500 });
   }
 }
